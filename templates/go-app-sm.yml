@@ -1,0 +1,45 @@
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app: go-app
+    chart: prometheus-operator-6.7.3
+    heritage: Tiller
+    release: prometheus-operator
+  name: go-app
+  namespace: monitoring
+spec:
+  endpoints:
+  - interval: 10s
+    path: /metrics
+    port: metrics
+  namespaceSelector:
+    matchNames:
+    - default
+  selector:
+    matchLabels:
+      name: go-app-svc
+      tier: frontend
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: kafka-evnt-dev-new-sm
+  namespace: monitoring
+  labels:
+      app.kubernetes.io/name: kafka-evnt-dev-new
+      release: prometheus-operator
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: kafka-evnt-dev-new
+      release: prometheus-operator
+  namespaceSelector:
+    matchNames:
+    - monitoring
+  endpoints:
+  - port: metrics
+    interval: 10s
+    honorLabels: true
+    path: /metrics
