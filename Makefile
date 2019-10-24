@@ -20,8 +20,8 @@ DOCKER_TAG ?= ${GIT_COMMIT}
 DOCKER_IMAGE ?= ${DOCKER_REGISTRY}/${DOCKER_REPOSITORY}:${DOCKER_TAG}
 
 # Go build flags
-GOOS := linux
-GOARCH := amd64
+GOOS := darwin
+GOARCH := 386
 GOLDFLAGS := '-w -s -X ${PROJECT}/version.Release=${DOCKER_TAG} -X ${PROJECT}/version.Commit=${DOCKER_TAG} -X ${PROJECT}/version.BuildTime=${BUILD_TIME}'
 
 # Help target
@@ -58,7 +58,7 @@ test:
 	go test -v -race ./...
 
 .PHONY: fmt
-fmt: 
+fmt:
 	@echo "-> $@"
 	@gofmt -s -l ./src | grep -v vendor | tee /dev/stderr
 
