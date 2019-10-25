@@ -19,6 +19,8 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+
+	guuid "github.com/google/uuid"
 )
 
 var counter int
@@ -107,12 +109,14 @@ func healthz(w http.ResponseWriter, r *http.Request) {
 }
 
 // uuid: UUID Generator
-// func uuid(w http.ResponseWriter, r *http.Request) {
-// 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-// 	w.Header().Set("X-Content-Type-Options", "nosniff")
-// 	w.WriteHeader(http.StatusOK)
-// 	fmt.Fprintln(w, "OK")
-// }
+func uuid(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json;")
+	w.Header().Set("X-Content-Type-Options", "nosniff")
+	id := guuid.New()
+	fmt.Printf("github.com/google/uuid:         %s\n", id.String())
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprintln(w, id)
+}
 
 // readyz: Rediness handler
 func readyz(w http.ResponseWriter, r *http.Request, isReady *atomic.Value) {
@@ -149,6 +153,9 @@ func main() {
 
 	// Liveness probe
 	http.HandleFunc("/healthz", healthz)
+
+	// UUID
+	http.HandleFunc("/uuid", uuid)
 
 	// Rediness probe (simulate X seconds load time)
 	isReady := &atomic.Value{}
