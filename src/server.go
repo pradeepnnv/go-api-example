@@ -106,6 +106,14 @@ func healthz(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "OK")
 }
 
+// uuid: UUID Generator
+// func uuid(w http.ResponseWriter, r *http.Request) {
+// 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+// 	w.Header().Set("X-Content-Type-Options", "nosniff")
+// 	w.WriteHeader(http.StatusOK)
+// 	fmt.Fprintln(w, "OK")
+// }
+
 // readyz: Rediness handler
 func readyz(w http.ResponseWriter, r *http.Request, isReady *atomic.Value) {
 	if isReady == nil || !isReady.Load().(bool) {
