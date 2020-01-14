@@ -65,7 +65,7 @@ amongst other default Go metrics collected by Prometheus.
 
 The included `Makefile` can be used to build a local binary or build, run and push a Docker container to dedicated remote repository.
 
-## Kubernetes deployment
+## Kubernetes deployment 
 
 To deploy to Kubernetes run:
 
