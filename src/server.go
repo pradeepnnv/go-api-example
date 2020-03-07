@@ -9,6 +9,7 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
+	"net/http/httputil"
 	"os"
 	"os/signal"
 	"strconv"
@@ -118,6 +119,28 @@ func uuid(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, id)
 }
 
+type testStruct struct {
+	Test string
+}
+
+// Prints JSON Request data
+func printJSONReq(w http.ResponseWriter, r *http.Request) {
+	// decoder := json.NewDecoder(r.Body)
+	// var t testStruct
+	// err := decoder.Decode(&t)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// log.Println(t)
+	// log.Println(decoder)
+	// Save a copy of this request for debugging.
+	requestDump, err := httputil.DumpRequest(r, true)
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(string(requestDump))
+}
+
 // readyz: Rediness handler
 func readyz(w http.ResponseWriter, r *http.Request, isReady *atomic.Value) {
 	if isReady == nil || !isReady.Load().(bool) {
@@ -156,6 +179,9 @@ func main() {
 
 	// UUID
 	http.HandleFunc("/uuid", uuid)
+
+	// UUID
+	http.HandleFunc("/printJSONReq", printJSONReq)
 
 	// Rediness probe (simulate X seconds load time)
 	isReady := &atomic.Value{}
