@@ -6,16 +6,16 @@ SHELL := bash
 .DELETE_ON_ERROR:
 .SUFFIXES:
 
-APP?=go-app
+APP?=go-api-example
 PORT?=8081
-PROJECT?=github.com/icicimov/$(APP)
+PROJECT?=github.com/pradeepnnv/$(APP)
 
 GIT_COMMIT := $(shell git rev-parse --short HEAD)
 BUILD_TIME := $(shell date -u '+%F_%T')
 
 # Docker vars
 DOCKER_REGISTRY := docker.io
-DOCKER_REPOSITORY ?= igoratencompass/$(APP)
+DOCKER_REPOSITORY ?= pradeepnnv/$(APP)
 DOCKER_TAG ?= ${GIT_COMMIT}
 DOCKER_IMAGE ?= ${DOCKER_REGISTRY}/${DOCKER_REPOSITORY}:${DOCKER_TAG}
 
