@@ -21,7 +21,7 @@ DOCKER_IMAGE ?= ${DOCKER_REGISTRY}/${DOCKER_REPOSITORY}:${DOCKER_TAG}
 
 # Go build flags
 GOOS := darwin
-GOARCH := 386
+GOARCH := amd64
 GOLDFLAGS := '-w -s -X ${PROJECT}/version.Release=${DOCKER_TAG} -X ${PROJECT}/version.Commit=${DOCKER_TAG} -X ${PROJECT}/version.BuildTime=${BUILD_TIME}'
 
 # Help target
@@ -51,6 +51,7 @@ clean:
 build: clean
 	@echo "-> $@"
 	go get -u github.com/prometheus/client_golang/prometheus
+	go get -u github.com/google/uuid
 	CGO_ENABLED=0 GOOS=$(GOOS) GOARCH=$(GOARCH) go build \
 		-a -ldflags $(GOLDFLAGS) -installsuffix cgo -o ${APP} ./src
 

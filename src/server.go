@@ -6,7 +6,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log"
 	"math/rand"
 	"net/http"
 	"net/http/httputil"
@@ -20,6 +19,8 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/rs/zerolog"
+	log "github.com/rs/zerolog/log"
 
 	guuid "github.com/google/uuid"
 )
@@ -29,6 +30,16 @@ var port = 8081
 var mutex = &sync.Mutex{}
 
 const tout int = 10
+
+func setup() {
+
+	zerolog.TimeFieldFormat = ""
+
+	zerolog.TimestampFunc = func() time.Time {
+		return time.Date(2008, 1, 8, 17, 5, 05, 0, time.UTC)
+	}
+	log.Logger = zerolog.New(os.Stdout).With().Timestamp().Logger()
+}
 
 // Prometheus Counter var
 var (
@@ -57,7 +68,7 @@ func checkRest(w http.ResponseWriter, r *http.Request) {
 
 	// Simulate random failure
 	err := rand.Intn(2) == 0
-	if err != false {
+	if err {
 		// if error increment total error
 		go RecordCurlError(vendor)
 		w.Write([]byte("Failed to fetch"))
@@ -114,14 +125,14 @@ func uuid(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json;")
 	w.Header().Set("X-Content-Type-Options", "nosniff")
 	id := guuid.New()
-	fmt.Printf("github.com/google/uuid:         %s\n", id.String())
+	log.Info().Msgf("github.com/google/uuid:         %s\n", id.String())
 	w.WriteHeader(http.StatusOK)
 	fmt.Fprintln(w, id)
 }
 
-type testStruct struct {
-	Test string
-}
+// type testStruct struct {
+// 	Test string
+// }
 
 // Prints JSON Request data
 func printJSONReq(w http.ResponseWriter, r *http.Request) {
@@ -138,7 +149,7 @@ func printJSONReq(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println(string(requestDump))
+	log.Info().Msg(string(requestDump))
 }
 
 // readyz: Rediness handler
@@ -159,13 +170,14 @@ func SetupCloseHandler() {
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-c
-		fmt.Println("\rCaught sig interrupt...exiting.")
+		log.Info().Msg("\rCaught sig interrupt...exiting.")
 		// Do something on exit, DeleteFiles() etc.
 		os.Exit(0)
 	}()
 }
 
 func main() {
+	setup()
 	SetupCloseHandler()
 
 	http.Handle("/metrics", promhttp.Handler())
@@ -225,7 +237,8 @@ func main() {
 		IdleTimeout:    15 * time.Second,
 		MaxHeaderBytes: 1 << 20, // Max header of 1MB
 	}
-	log.Print("Starting the service listening on port " + sport + " ...")
+	log.Info().Msg("Starting the service listening on port " + sport + " ...")
 	//log.Fatal(http.ListenAndServe(sport, nil))
-	log.Fatal(s.ListenAndServe())
+	// log.Fatal(s.ListenAndServe())
+	log.Fatal().Err(s.ListenAndServe())
 }
