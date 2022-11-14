@@ -55,6 +55,13 @@ build: clean
 	CGO_ENABLED=0 GOOS=$(GOOS) GOARCH=$(GOARCH) go build \
 		-a -ldflags $(GOLDFLAGS) -installsuffix cgo -o ${APP} ./src
 
+build-linux: clean
+	@echo "-> $@"
+	go get -u github.com/prometheus/client_golang/prometheus
+	go get -u github.com/google/uuid
+	CGO_ENABLED=0 GOOS=linux GOARCH=$(GOARCH) go build \
+		-a -ldflags $(GOLDFLAGS) -installsuffix cgo -o linux-${APP} ./src
+
 test:
 	go test -v -race ./...
 
