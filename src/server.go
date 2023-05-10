@@ -114,20 +114,34 @@ func echoString(w http.ResponseWriter, r *http.Request) {
 
 // healthz: Health handler
 func healthz(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-	w.Header().Set("X-Content-Type-Options", "nosniff")
-	w.WriteHeader(http.StatusOK)
-	fmt.Fprintln(w, "OK")
+
+	switch r.Method {
+	case http.MethodGet:
+		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+		w.Header().Set("X-Content-Type-Options", "nosniff")
+		w.WriteHeader(http.StatusOK)
+		fmt.Fprintln(w, "OK")
+	default:
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+	}
+
 }
 
 // uuid: UUID Generator
 func uuid(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json;")
-	w.Header().Set("X-Content-Type-Options", "nosniff")
-	id := guuid.New()
-	log.Info().Msgf("github.com/google/uuid:         %s\n", id.String())
-	w.WriteHeader(http.StatusOK)
-	fmt.Fprintln(w, id)
+
+	switch r.Method {
+	case http.MethodGet:
+		w.Header().Set("Content-Type", "application/json;")
+		w.Header().Set("X-Content-Type-Options", "nosniff")
+		id := guuid.New()
+		log.Info().Msgf("github.com/google/uuid:         %s\n", id.String())
+		w.WriteHeader(http.StatusOK)
+		fmt.Fprintln(w, id)
+	default:
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+	}
+
 }
 
 // type testStruct struct {
@@ -136,32 +150,34 @@ func uuid(w http.ResponseWriter, r *http.Request) {
 
 // Prints JSON Request data
 func printJSONReq(w http.ResponseWriter, r *http.Request) {
-	// decoder := json.NewDecoder(r.Body)
-	// var t testStruct
-	// err := decoder.Decode(&t)
-	// if err != nil {
-	// 	panic(err)
-	// }
-	// log.Println(t)
-	// log.Println(decoder)
-	// Save a copy of this request for debugging.
-	requestDump, err := httputil.DumpRequest(r, true)
-	if err != nil {
-		fmt.Println(err)
+	switch r.Method {
+	case http.MethodGet:
+		requestDump, err := httputil.DumpRequest(r, true)
+		if err != nil {
+			fmt.Println(err)
+		}
+		log.Info().Msg(string(requestDump))
+	default:
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 	}
-	log.Info().Msg(string(requestDump))
+
 }
 
 // readyz: Rediness handler
 func readyz(w http.ResponseWriter, r *http.Request, isReady *atomic.Value) {
-	if isReady == nil || !isReady.Load().(bool) {
-		http.Error(w, http.StatusText(http.StatusServiceUnavailable), http.StatusServiceUnavailable)
-		return
+	switch r.Method {
+	case http.MethodGet:
+		if isReady == nil || !isReady.Load().(bool) {
+			http.Error(w, http.StatusText(http.StatusServiceUnavailable), http.StatusServiceUnavailable)
+			return
+		}
+		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+		w.Header().Set("X-Content-Type-Options", "nosniff")
+		w.WriteHeader(http.StatusOK)
+		fmt.Fprintln(w, "OK")
+	default:
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 	}
-	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
-	w.Header().Set("X-Content-Type-Options", "nosniff")
-	w.WriteHeader(http.StatusOK)
-	fmt.Fprintln(w, "OK")
 }
 
 // SetupCloseHandler Interupt handler

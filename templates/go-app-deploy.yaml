@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: go-api-example
+  name: go-api-example
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: go-api-example
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: go-api-example
+    spec:
+      containers:
+      - image: localhost/pradeepnnv/go-api-example:5ac2ea0
+        name: go-api-example
+        resources: {}
+status: {}

@@ -76,7 +76,7 @@ lint:
 	@go get -u golang.org/x/lint/golint
 	@golint ./... | tee /dev/stderr
 
-container:
+container: build-linux
 	docker build -t ${DOCKER_IMAGE} --build-arg 'PORT=${PORT}' --build-arg GOLDFLAGS=$(GOLDFLAGS) .
 
 run: container
